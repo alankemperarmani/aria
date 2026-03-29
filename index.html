@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.R.I.A.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Share+Tech+Mono&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #c9a84c;
+    --gold-dim: #8a6f2e;
+    --gold-glow: 0 0 12px #c9a84c88, 0 0 35px #c9a84c33;
+    --gold-glow-strong: 0 0 20px #c9a84ccc, 0 0 60px #c9a84c55;
+    --violet: #7c3aed;
+    --violet-dim: #4c1d95;
+    --violet-glow: 0 0 12px #7c3aed66, 0 0 35px #7c3aed22;
+    --bg: #07050f;
+    --bg2: #0d0820;
+    --border: #c9a84c18;
+    --border-violet: #7c3aed22;
+    --text: #e8dfc8;
+    --text-dim: #9d8f72;
+    --danger: #ff3355;
+    --green: #00e5a0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Raleway', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+
+  /* Radial ambient glow background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 100%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 20% at 20% 80%, rgba(124,58,237,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+    animation: ambientPulse 10s ease-in-out infinite;
+  }
+  @keyframes ambientPulse { 0%,100%{opacity:.7} 50%{opacity:1} }
+
+  /* Fine grid */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── KEY SCREEN ── */
+  #keyScreen {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+    padding: 40px;
+  }
+
+  .aria-sigil {
+    width: 80px; height: 80px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .aria-sigil svg { width: 100%; height: 100%; }
+
+  .key-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 14px;
+    color: var(--gold);
+    text-shadow: var(--gold-glow);
+    text-align: center;
+  }
+  .key-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold-dim);
+    opacity: .8;
+    text-align: center;
+  }
+  .key-tagline {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-align: center;
+    font-style: italic;
+  }
+  .key-card {
+    border: 1px solid rgba(201,168,76,0.2);
+    background: rgba(201,168,76,0.03);
+    padding: 30px 36px;
+    border-radius: 4px;
+    display: flex; flex-direction: column; gap: 14px;
+    width: 100%; max-width: 500px;
+    position: relative;
+  }
+  .key-card::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 20px; right: 20px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: .6;
+  }
+  .key-card label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; color: var(--gold-dim);
+  }
+  .key-input {
+    background: rgba(0,0,0,.5);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; padding: 11px 14px; outline: none; width: 100%;
+    transition: border-color .2s; letter-spacing: 1px;
+  }
+  .key-input:focus { border-color: var(--gold-dim); }
+  .key-input::placeholder { color: #c9a84c18; }
+  .key-btn {
+    background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(124,58,237,0.1));
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    cursor: pointer; padding: 13px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 5px;
+    transition: all .25s; border-radius: 2px;
+  }
+  .key-btn:hover { background: rgba(201,168,76,0.15); box-shadow: var(--gold-glow); }
+  .key-error {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    color: var(--danger); letter-spacing: 2px; display: none;
+  }
+  .key-error.show { display: block; }
+  .key-features { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .feat-tag {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    padding: 3px 9px; border: 1px solid rgba(201,168,76,0.25); border-radius: 2px;
+    color: var(--gold-dim); opacity: .9;
+  }
+  .key-note {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    color: var(--text-dim); opacity: .45; letter-spacing: 1px;
+    text-align: center; line-height: 1.9; max-width: 420px;
+  }
+  .remember-row {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--text-dim);
+  }
+  .remember-row input[type=checkbox] {
+    accent-color: var(--gold); width: 14px; height: 14px; cursor: pointer;
+  }
+  .saved-indicator {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; color: var(--green); flex-wrap: wrap;
+  }
+  .saved-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 6px var(--green);
+    animation: blink 2s ease-in-out infinite; flex-shrink: 0;
+  }
+  .forget-btn {
+    background: transparent; border: 1px solid rgba(255,51,85,.3);
+    color: #ff7799; cursor: pointer; padding: 2px 8px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; border-radius: 2px; transition: all .2s; margin-left: 4px;
+  }
+  .forget-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .device-tag {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; padding: 3px 8px;
+    border: 1px solid rgba(0,229,160,0.3); border-radius: 2px;
+    color: var(--green); background: rgba(0,229,160,0.05);
+  }
+
+  /* ── CORNERS ── */
+  .corner { position: fixed; width: 28px; height: 28px; z-index: 3; opacity: .35; }
+  .corner-tl { top:12px; left:12px; border-top:1px solid var(--gold); border-left:1px solid var(--gold); }
+  .corner-tr { top:12px; right:12px; border-top:1px solid var(--gold); border-right:1px solid var(--gold); }
+  .corner-bl { bottom:12px; left:12px; border-bottom:1px solid var(--gold); border-left:1px solid var(--gold); }
+  .corner-br { bottom:12px; right:12px; border-bottom:1px solid var(--gold); border-right:1px solid var(--gold); }
+
+  /* ── MAIN APP ── */
+  .container {
+    position: relative; z-index: 2;
+    width: 100%; max-width: 1280px; height: 100vh;
+    display: none; flex-direction: column;
+    padding: 14px; gap: 8px;
+  }
+
+  /* Below header: face left, chat right */
+  .main-body {
+    flex: 1; display: flex; gap: 10px; min-height: 0;
+  }
+  .face-col {
+    width: 280px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .chat-col {
+    flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0;
+  }
+  @media (max-width: 720px) {
+    .main-body { flex-direction: column; }
+    .face-col { width: 100%; }
+    .face-panel { height: 200px; }
+    .face-svg-wrap svg { height: 185px; }
+  }
+
+  /* Header */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); padding-bottom: 12px;
+  }
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .logo-sigil { width: 42px; height: 42px; flex-shrink: 0; }
+  .logo-sigil svg { width: 100%; height: 100%; animation: sigilPulse 6s ease-in-out infinite; }
+  @keyframes sigilPulse { 0%,100%{filter:drop-shadow(0 0 4px #c9a84c66)} 50%{filter:drop-shadow(0 0 12px #c9a84caa)} }
+  .logo-text {
+    font-family: 'Cinzel', serif;
+    font-size: 24px; font-weight: 700; letter-spacing: 10px;
+    color: var(--gold); text-shadow: var(--gold-glow);
+  }
+  .logo-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; color: var(--gold-dim); letter-spacing: 3px; opacity: .7;
+  }
+
+  .status-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .status-badge {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    padding: 3px 8px; border: 1px solid var(--border); border-radius: 2px;
+    display: flex; align-items: center; gap: 5px; color: var(--text-dim);
+  }
+  .status-badge.live { border-color: rgba(0,229,160,0.3); color: var(--green); }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 5px var(--gold); animation: blink 2s ease-in-out infinite; }
+  .status-dot.live { background: var(--green); box-shadow: 0 0 5px var(--green); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+  .reset-btn {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    padding: 3px 8px; border: 1px solid rgba(255,51,85,.3); border-radius: 2px;
+    color: #ff7799; background: transparent; cursor: pointer; transition: all .2s;
+  }
+  .reset-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .user-tag {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 3px;
+    padding: 4px 12px; border: 1px solid rgba(201,168,76,.3); border-radius: 2px;
+    color: var(--gold); background: rgba(201,168,76,.05);
+    text-shadow: 0 0 8px #c9a84c66;
+  }
+
+  /* Quick commands */
+  .quick-cmds { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+  .qcmd {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px;
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 2px;
+    color: var(--text-dim); background: transparent; cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .qcmd:hover { border-color: var(--gold-dim); color: var(--gold); box-shadow: 0 0 8px #c9a84c18; }
+  .qcmd.pred { border-color: rgba(124,58,237,0.3); color: #a78bfa; }
+  .qcmd.pred:hover { border-color: rgba(124,58,237,0.7); color: #c4b5fd; box-shadow: 0 0 8px rgba(124,58,237,0.25); }
+  .section-label { font-family: 'Share Tech Mono', monospace; font-size: 8px; letter-spacing: 3px; color: var(--text-dim); opacity: 0.4; width: 100%; padding-top: 2px; }
+
+  /* Memory system */
+  .memory-badge {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    padding: 3px 8px; border: 1px solid rgba(201,168,76,0.35); border-radius: 2px;
+    color: var(--gold-dim); background: rgba(201,168,76,0.05);
+    cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 5px;
+  }
+  .memory-badge:hover { border-color: var(--gold); color: var(--gold); }
+  .memory-badge .mem-count { color: var(--gold); font-weight: 700; }
+
+  .memory-recall { display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    color: #a78bfa; letter-spacing: 2px; margin-bottom: 7px; opacity: .85; }
+  .memory-recall::before { content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: #a78bfa; box-shadow: 0 0 5px #a78bfa; flex-shrink: 0; }
+
+  /* Memory panel overlay */
+  #memoryPanel {
+    display: none; position: fixed; inset: 0; z-index: 150;
+    background: rgba(7,5,15,0.92); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 32px;
+  }
+  #memoryPanel.open { display: flex; }
+  .mem-panel-inner {
+    border: 1px solid rgba(201,168,76,0.25); background: var(--bg2);
+    border-radius: 4px; width: 100%; max-width: 660px; max-height: 80vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    position: relative;
+  }
+  .mem-panel-inner::before {
+    content: ''; position: absolute; top: -1px; left: 20px; right: 20px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: .5;
+  }
+  .mem-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+  }
+  .mem-title { font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 5px; color: var(--gold); }
+  .mem-close { background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    cursor: pointer; padding: 4px 10px; font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; border-radius: 2px; transition: all .2s; }
+  .mem-close:hover { border-color: var(--danger); color: var(--danger); }
+  .mem-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .mem-body::-webkit-scrollbar { width: 2px; }
+  .mem-body::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+  .mem-section-title { font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; color: var(--gold-dim); margin-bottom: 8px; opacity: .8; }
+  .mem-items { display: flex; flex-direction: column; gap: 6px; }
+  .mem-item { background: rgba(201,168,76,0.04); border: 1px solid var(--border);
+    border-radius: 2px; padding: 8px 12px; font-size: 13px; color: var(--text);
+    font-family: 'Raleway', sans-serif; line-height: 1.5; position: relative; }
+  .mem-item::before { content: ''; position: absolute; left: -1px; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.5), transparent); }
+  .mem-item .mem-date { font-family: 'Share Tech Mono', monospace; font-size: 8px;
+    color: var(--text-dim); opacity: .5; letter-spacing: 1px; margin-top: 4px; }
+  .mem-empty { font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    color: var(--text-dim); opacity: .4; letter-spacing: 2px; text-align: center; padding: 20px; }
+  .mem-footer { padding: 14px 24px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; }
+  .mem-clear-btn { background: transparent; border: 1px solid rgba(255,51,85,.3);
+    color: #ff7799; cursor: pointer; padding: 6px 14px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    border-radius: 2px; transition: all .2s; }
+  .mem-clear-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .mem-stats { font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    color: var(--text-dim); letter-spacing: 1px; opacity: .5; }
+  .learning-pulse { display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; color: #a78bfa;
+    letter-spacing: 2px; }
+  .learning-pulse::before { content: ''; display: inline-block; width: 7px; height: 7px;
+    border: 1px solid #a78bfa; border-top-color: transparent; border-radius: 50%;
+    animation: spin 0.45s linear infinite; }
+
+  /* Chat */
+  .chat-area {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+    gap: 10px; padding-right: 4px; scroll-behavior: smooth;
+  }
+  .chat-area::-webkit-scrollbar { width: 2px; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; opacity: .5; }
+
+  .message { display: flex; gap: 12px; animation: msgIn .35s ease-out; }
+  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .msg-label {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    min-width: 56px; padding-top: 4px; text-align: right; flex-shrink: 0;
+  }
+  .message.user .msg-label { color: #8888cc; }
+  .message.aria .msg-label { color: var(--gold); }
+
+  .msg-content {
+    flex: 1; padding: 10px 14px; border-radius: 2px;
+    font-size: 14px; line-height: 1.7; position: relative;
+    font-family: 'Raleway', sans-serif; font-weight: 400;
+  }
+  .message.user .msg-content {
+    background: rgba(124,58,237,.07);
+    border: 1px solid rgba(124,58,237,.2);
+    color: #b0a8e0;
+  }
+  .message.aria .msg-content {
+    background: rgba(201,168,76,.04);
+    border: 1px solid rgba(201,168,76,.14);
+    color: var(--text);
+  }
+  .message.aria .msg-content::before {
+    content: '';
+    position: absolute; left: -1px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  .search-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    color: var(--green); letter-spacing: 2px; margin-bottom: 7px; opacity: .85;
+  }
+  .search-badge::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 5px var(--green); flex-shrink: 0;
+  }
+
+  .thinking { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+  .thinking span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); animation: thinkPulse 0.7s ease-in-out infinite; opacity: .3;
+  }
+  .thinking span:nth-child(2){animation-delay:.12s} .thinking span:nth-child(3){animation-delay:.24s}
+  @keyframes thinkPulse { 0%,100%{opacity:.15;transform:scale(.7)} 50%{opacity:1;transform:scale(1.2)} }
+
+  .spin-msg {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    color: var(--green); letter-spacing: 2px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .spin-msg::before {
+    content: ''; display: inline-block; width: 8px; height: 8px;
+    border: 1px solid var(--green); border-top-color: transparent;
+    border-radius: 50%; animation: spin 0.45s linear infinite;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+
+  /* Voice section */
+  .voice-section {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; padding: 10px 0;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .visualizer { display: flex; align-items: center; gap: 3px; height: 34px; }
+  .bar {
+    width: 3px; background: var(--gold); border-radius: 2px;
+    transition: height .1s ease; box-shadow: 0 0 5px var(--gold); min-height: 3px;
+  }
+
+  .mic-btn {
+    position: relative; width: 62px; height: 62px; border-radius: 50%;
+    background: transparent; border: 1px solid var(--gold);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .25s ease; box-shadow: var(--gold-glow); outline: none;
+  }
+  .mic-btn:hover { box-shadow: var(--gold-glow-strong); border-color: #ffe08a; }
+  .mic-btn.listening {
+    border-color: var(--danger);
+    box-shadow: 0 0 20px #ff335566;
+    animation: micPulse 1s ease-in-out infinite;
+  }
+  @keyframes micPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+  .mic-btn svg { width: 22px; height: 22px; fill: var(--gold); transition: fill .2s; }
+  .mic-btn.listening svg { fill: var(--danger); }
+  .mic-btn.listening::before,.mic-btn.listening::after {
+    content: ''; position: absolute; border-radius: 50%;
+    border: 1px solid var(--danger); animation: ripple 1.6s ease-out infinite;
+  }
+  .mic-btn.listening::after { animation-delay: .75s; }
+  @keyframes ripple { from{width:62px;height:62px;opacity:.5} to{width:112px;height:112px;opacity:0} }
+
+  .hint-text {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    letter-spacing: 3px; color: var(--text-dim); opacity: .5; text-align: center;
+  }
+  .text-input-row { display: flex; gap: 8px; align-items: center; width: 100%; }
+  .text-input {
+    flex: 1; background: rgba(201,168,76,.02);
+    border: 1px solid var(--border); border-radius: 2px;
+    color: var(--text); font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; padding: 9px 13px; outline: none;
+    transition: border-color .2s; letter-spacing: 1px;
+  }
+  .text-input:focus { border-color: var(--gold-dim); }
+  .text-input::placeholder { color: #c9a84c18; }
+  .send-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--gold); cursor: pointer; padding: 9px 18px;
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; transition: all .2s; border-radius: 2px; white-space: nowrap;
+  }
+  .send-btn:hover { border-color: var(--gold); box-shadow: var(--gold-glow); }
+
+  .welcome-msg {
+    font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    color: var(--gold-dim); text-align: center; opacity: .55;
+    letter-spacing: 2px; padding: 20px 0;
+  }
+
+  /* Attachment system */
+  .attach-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--gold-dim); cursor: pointer; padding: 9px 12px;
+    font-size: 15px; border-radius: 2px; transition: all .2s;
+    flex-shrink: 0; line-height: 1;
+  }
+  .attach-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 8px #c9a84c22; }
+  .attach-btn.has-file { border-color: rgba(0,229,160,.5); color: var(--green); box-shadow: 0 0 8px rgba(0,229,160,.2); }
+
+  /* Attachment preview strip */
+  #attachPreview {
+    display: none; align-items: center; gap: 10px;
+    padding: 8px 12px; background: rgba(201,168,76,.04);
+    border: 1px solid rgba(201,168,76,.15); border-radius: 2px;
+    margin-bottom: 4px; animation: msgIn .25s ease-out;
+  }
+  #attachPreview.show { display: flex; }
+  .attach-thumb {
+    width: 44px; height: 44px; object-fit: cover; border-radius: 2px;
+    border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .attach-icon {
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    background: rgba(201,168,76,.08); border: 1px solid var(--border);
+    border-radius: 2px; font-size: 20px; flex-shrink: 0;
+  }
+  .attach-info { flex: 1; min-width: 0; }
+  .attach-name {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px;
+    color: var(--gold); letter-spacing: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .attach-meta {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    color: var(--text-dim); letter-spacing: 1px; margin-top: 3px; opacity: .7;
+  }
+  .attach-remove {
+    background: transparent; border: none; color: var(--text-dim);
+    cursor: pointer; font-size: 16px; padding: 4px; transition: color .2s;
+    flex-shrink: 0;
+  }
+  .attach-remove:hover { color: var(--danger); }
+
+  /* Attachment badge in chat message */
+  .attach-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    color: var(--gold-dim); letter-spacing: 2px; margin-bottom: 6px;
+    padding: 3px 8px; background: rgba(201,168,76,.06);
+    border: 1px solid rgba(201,168,76,.15); border-radius: 2px;
+  }
+  .msg-image-preview {
+    max-width: 220px; max-height: 160px; border-radius: 2px;
+    border: 1px solid var(--border); margin-bottom: 8px; display: block;
+  }
+
+  .stop-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: transparent; border: 1px solid rgba(255,51,85,.5);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .2s; outline: none; flex-shrink: 0;
+  }
+  .stop-btn svg { fill: var(--danger); }
+  .stop-btn:hover { border-color: var(--danger); box-shadow: 0 0 10px #ff335544; }
+
+  /* ── ARIA FACE PANEL ── */
+  .face-panel {
+    position: relative; width: 100%;
+    flex: 1; min-height: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(124,58,237,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 60%),
+                #07050f;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 2px; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .face-panel::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(201,168,76,0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(201,168,76,0.02) 1px, transparent 1px);
+    background-size: 32px 32px; pointer-events: none;
+  }
+  .face-panel-top {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 12px; border-bottom: 1px solid rgba(201,168,76,0.1);
+    background: rgba(7,5,15,0.6); z-index: 5;
+  }
+  .face-label {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; color: var(--gold-dim); opacity: .7;
+  }
+  .face-status {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; display: flex; align-items: center; gap: 6px;
+  }
+  .face-status-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 6px var(--green);
+    animation: blink 2s ease-in-out infinite;
+  }
+  .face-status-dot.thinking { background: #a78bfa; box-shadow: 0 0 6px #a78bfa; animation: blink .5s ease-in-out infinite; }
+  .face-status-dot.speaking { background: var(--gold); box-shadow: 0 0 8px var(--gold); animation: blink .3s ease-in-out infinite; }
+  .face-status-text { color: var(--text-dim); font-size: 9px; }
+  .face-toggle {
+    background: transparent; border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold-dim); cursor: pointer; padding: 2px 8px;
+    font-family: 'Share Tech Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; border-radius: 2px; transition: all .2s;
+  }
+  .face-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+  .face-svg-wrap {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    padding-top: 22px;
+  }
+  .face-svg-wrap svg {
+    height: min(100%, 340px); width: auto; max-width: 100%;
+    transition: filter .4s ease;
+  }
+
+  /* Eye blink animation */
+  @keyframes eyeBlink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.05); }
+  }
+  #leftEyeLid, #rightEyeLid {
+    transform-origin: center;
+    animation: eyeBlink 5s ease-in-out infinite;
+  }
+  #rightEyeLid { animation-delay: 0.05s; }
+
+  /* Iris rotate idle */
+  @keyframes irisIdle {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+  }
+  .iris-ring { transform-box: fill-box; transform-origin: center; animation: irisIdle 8s linear infinite; }
+
+  /* Speaking mouth pulse */
+  @keyframes mouthOpen {
+    0%, 100% { d: path("M 174 260 Q 200 275 226 260 Q 213 268 200 270 Q 187 268 174 260 Z"); }
+    25% { d: path("M 174 260 Q 200 282 226 260 Q 213 273 200 276 Q 187 273 174 260 Z"); }
+    50% { d: path("M 174 260 Q 200 270 226 260 Q 213 265 200 267 Q 187 265 174 260 Z"); }
+    75% { d: path("M 174 260 Q 200 280 226 260 Q 213 271 200 274 Q 187 271 174 260 Z"); }
+  }
+  .aria-speaking #lowerLip {
+    animation: mouthOpen 0.35s ease-in-out infinite;
+  }
+
+  /* Speaking eye glow boost */
+  .aria-speaking #leftEyeGlow, .aria-speaking #rightEyeGlow {
+    filter: brightness(1.8) drop-shadow(0 0 8px #c9a84c);
+  }
+  /* Thinking - eyes shift left/right */
+  @keyframes thinkingEyes {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+  .aria-thinking #leftEye, .aria-thinking #rightEye {
+    animation: thinkingEyes 1.5s ease-in-out infinite;
+  }
+  /* Thinking scan line speed up */
+  .aria-thinking #scanLineRect animate { dur: 0.8s; }
+
+  /* Speaking overall glow */
+  .aria-speaking .face-svg-wrap svg {
+    filter: drop-shadow(0 0 15px rgba(201,168,76,0.3));
+  }
+  /* Idle breathing */
+  @keyframes faceBreath {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.008) translateY(-1px); }
+  }
+  #faceGroup { animation: faceBreath 4s ease-in-out infinite; transform-origin: 200px 235px; }
+
+  /* Face panel collapsed */
+  .face-panel.collapsed { height: 32px; }
+  .face-panel.collapsed .face-svg-wrap { display: none; }
+
+  /* Persona card */
+  .persona-card {
+    flex-shrink: 0; padding: 10px 14px;
+    background: rgba(201,168,76,0.03);
+    border: 1px solid rgba(201,168,76,0.12); border-radius: 2px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .persona-name {
+    font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 6px;
+    color: var(--gold); text-shadow: 0 0 10px #c9a84c55;
+  }
+  .persona-title {
+    font-family: 'Share Tech Mono', monospace; font-size: 8px;
+    letter-spacing: 2px; color: var(--text-dim); opacity: .6; line-height: 1.5;
+  }
+  .persona-traits { display: flex; gap: 5px; flex-wrap: wrap; }
+  .trait {
+    font-family: 'Share Tech Mono', monospace; font-size: 8px; letter-spacing: 1px;
+    padding: 2px 7px; border: 1px solid rgba(124,58,237,0.35);
+    border-radius: 2px; color: #a78bfa; opacity: .85;
+  }
+</style>
+</head>
+<body>
+
+<!-- KEY SCREEN -->
+<div id="keyScreen">
+  <!-- Sigil -->
+  <div class="aria-sigil">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" stroke="#c9a84c" stroke-width="0.6" opacity="0.3"/>
+      <circle cx="40" cy="40" r="30" stroke="#c9a84c" stroke-width="0.6" opacity="0.5" stroke-dasharray="4 3"/>
+      <circle cx="40" cy="40" r="20" stroke="#7c3aed" stroke-width="0.6" opacity="0.6"/>
+      <circle cx="40" cy="40" r="8" fill="#c9a84c" opacity="0.9" filter="url(#glow)"/>
+      <g stroke="#c9a84c" stroke-width="0.6" opacity="0.5">
+        <line x1="40" y1="2" x2="40" y2="20"/><line x1="40" y1="60" x2="40" y2="78"/>
+        <line x1="2" y1="40" x2="20" y2="40"/><line x1="60" y1="40" x2="78" y2="40"/>
+        <line x1="11" y1="11" x2="23" y2="23"/><line x1="57" y1="57" x2="69" y2="69"/>
+        <line x1="69" y1="11" x2="57" y2="23"/><line x1="23" y1="57" x2="11" y2="69"/>
+      </g>
+      <defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    </svg>
+  </div>
+
+  <div class="key-logo">A.R.I.A.</div>
+  <div class="key-sub">Adaptive Reasoning &amp; Intelligence Architecture</div>
+  <div class="key-tagline">Personal AI — Exclusively Calibrated for Lord Armani</div>
+
+  <div class="key-card">
+    <label>ANTHROPIC API KEY</label>
+    <div style="position:relative;">
+      <input class="key-input" id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="padding-right:44px;" />
+      <button id="toggleKeyVis" onclick="toggleKeyVisibility()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--gold-dim);cursor:pointer;font-size:14px;padding:4px;">👁</button>
+    </div>
+    <div class="key-error" id="keyError">⚠ INVALID KEY — MUST BEGIN WITH sk-ant-</div>
+    <label class="remember-row">
+      <input type="checkbox" id="rememberKey" checked />
+      <span>Remember on this device</span>
+    </label>
+    <button class="key-btn" id="keySubmit">INITIALISE A.R.I.A.</button>
+    <div class="saved-indicator" id="savedIndicator" style="display:none;">
+      <span class="saved-dot"></span> KEY SAVED ON THIS DEVICE — <span id="deviceName"></span>
+      <button onclick="forgetKey()" class="forget-btn">FORGET</button>
+    </div>
+  </div>
+
+  <div class="key-features">
+    <div class="feat-tag">⚡ LIVE WEB INTELLIGENCE</div>
+    <div class="feat-tag">🌐 REAL-TIME DATA</div>
+    <div class="feat-tag">🎙 BRITISH VOICE</div>
+    <div class="feat-tag">👑 LORD ARMANI PROTOCOL</div>
+  </div>
+
+  <div class="key-note">
+    Get your key at console.anthropic.com → API Keys<br/>
+    When "Remember on this device" is checked, your key is stored in this browser only.<br/>
+    It never leaves your device and is never sent to anyone except Anthropic.
+  </div>
+</div>
+
+<!-- CORNERS -->
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- MAIN APP -->
+<div class="container" id="mainApp">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-sigil">
+        <svg viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="21" cy="21" r="19.5" stroke="#c9a84c" stroke-width="0.6" opacity="0.35"/>
+          <circle cx="21" cy="21" r="14" stroke="#c9a84c" stroke-width="0.6" opacity="0.55" stroke-dasharray="3 2.5"/>
+          <circle cx="21" cy="21" r="8" stroke="#7c3aed" stroke-width="0.6" opacity="0.7"/>
+          <circle cx="21" cy="21" r="3.5" fill="#c9a84c" opacity="0.95"/>
+          <g stroke="#c9a84c" stroke-width="0.5" opacity="0.5">
+            <line x1="21" y1="1.5" x2="21" y2="8"/><line x1="21" y1="34" x2="21" y2="40.5"/>
+            <line x1="1.5" y1="21" x2="8" y2="21"/><line x1="34" y1="21" x2="40.5" y2="21"/>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">A.R.I.A.</div>
+        <div class="logo-sub">Adaptive Reasoning &amp; Intelligence Architecture</div>
+      </div>
+    </div>
+    <div class="status-row">
+      <div class="user-tag" id="userTag">LORD ARMANI</div>
+      <div class="memory-badge" id="memoryBadge" onclick="openMemoryPanel()">🧠 MEMORY <span class="mem-count" id="memCount">0</span></div>
+      <div class="device-tag" id="deviceTag" style="display:none;"></div>
+      <button class="reset-btn" id="resetKeyBtn">CHANGE KEY</button>
+      <div class="status-badge live"><div class="status-dot live"></div>LIVE INTEL</div>
+      <div class="status-badge"><div class="status-dot"></div>ONLINE</div>
+    </div>
+  </div>
+
+
+  <div class="main-body">
+  <div class="face-col">
+  <!-- ARIA FACE PANEL -->
+  <div class="face-panel" id="facePanel">
+    <div class="face-panel-top">
+      <div class="face-label">A.R.I.A. — WAVEFORM INTERFACE</div>
+      <div class="face-status">
+        <div class="face-status-dot" id="faceStatusDot"></div>
+        <span class="face-status-text" id="faceStatusText">STANDBY</span>
+      </div>
+      <button class="face-toggle" id="faceToggleBtn" onclick="toggleFacePanel()">▲ HIDE</button>
+    </div>
+    <div class="face-svg-wrap" id="faceSvgWrap">
+      <canvas id="ariaWaveCanvas"></canvas>
+    </div>    </div>
+  </div>
+
+  <!-- Persona card below face -->
+  <div class="persona-card" id="personaCard">
+    <div class="persona-name">A.R.I.A.</div>
+    <div class="persona-title">Adaptive Reasoning &amp; Intelligence Architecture</div>
+    <div class="persona-traits">
+      <span class="trait">Oxford Intelligence</span>
+      <span class="trait">Live Search</span>
+      <span class="trait">Adaptive Memory</span>
+    </div>
+  </div>
+  </div><!-- /face-col -->
+
+  <div class="chat-col">
+  <div class="quick-cmds">
+    <span class="section-label">— LIVE DATA —</span>
+    <button class="qcmd" onclick="quickCmd('What is the current weather in Los Angeles right now?')">🌤 LA Weather</button>
+    <button class="qcmd" onclick="quickCmd('What are the top news headlines today?')">📰 Top News</button>
+    <button class="qcmd" onclick="quickCmd('What are the current stock prices of Tesla, Apple, and NVIDIA?')">📈 Stocks</button>
+    <button class="qcmd" onclick="quickCmd('What is the current price of Bitcoin and Ethereum?')">₿ Crypto</button>
+    <button class="qcmd" onclick="quickCmd('What are the latest sports scores and results today?')">🏆 Sports</button>
+    <span class="section-label">— PREDICTIONS & RECOMMENDATIONS —</span>
+    <button class="qcmd pred" onclick="quickCmd('Search for the latest weather forecasts and give me a 7-day weather prediction for Los Angeles with your recommendations for each day.')">🔮 Weather Forecast</button>
+    <button class="qcmd pred" onclick="quickCmd('Search for current stock market conditions and analyst forecasts, then give me your top 3 stock predictions and buy/sell recommendations for the next 3 months.')">📊 Stock Predictions</button>
+    <button class="qcmd pred" onclick="quickCmd('Search for the latest crypto market analysis and forecasts, then give me your predictions and recommendations for Bitcoin and Ethereum over the next 30-90 days.')">₿ Crypto Outlook</button>
+    <button class="qcmd pred" onclick="quickCmd('Search for current airline pricing trends and travel industry forecasts, then tell me: when are the best times to book flights in the next 3 months to get the lowest prices? Which routes or seasons should Lord Armani watch?')">✈️ Flight Prices</button>
+    <button class="qcmd pred" onclick="quickCmd('Search for current travel trends, weather forecasts, and seasonal pricing data, then give me your top 5 destination recommendations for travel right now or within the next 3 months — with ideal travel windows, what to expect, and why each is worth considering.')">🌍 Travel Picks</button>
+    <button class="qcmd pred" onclick="quickCmd('Based on current market conditions, economic outlook, and recent forecasts you can find, give me a comprehensive set of predictions across weather patterns, stock market, crypto, travel costs, and best upcoming travel windows for the next 90 days.')">🧠 Full Briefing</button>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="welcome-msg">A.R.I.A. ONLINE — WELCOME BACK, LORD ARMANI</div>
+  </div>
+
+  <div class="voice-section">
+    <div class="visualizer" id="visualizer"></div>
+    <div style="display:flex;align-items:center;gap:20px;">
+      <button class="mic-btn" id="micBtn" title="Click to speak">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm6.5 9.5a.5.5 0 0 1 1 0A7.5 7.5 0 0 1 12.5 18v2.5H15a.5.5 0 0 1 0 1H9a.5.5 0 0 1 0-1h2.5V18A7.5 7.5 0 0 1 4.5 10.5a.5.5 0 0 1 1 0A6.5 6.5 0 0 0 12 17a6.5 6.5 0 0 0 6.5-6.5z"/>
+        </svg>
+      </button>
+      <button class="stop-btn" id="stopBtn" title="Stop speaking" onclick="stopSpeech()" style="display:none;">
+        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="hint-text" id="hintText">CLICK MIC TO SPEAK — OR TYPE BELOW</div>
+    <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.csv,.json,.md,.docx,.xlsx" style="display:none;" />
+    <div id="attachPreview">
+      <div id="attachIconOrThumb"></div>
+      <div class="attach-info">
+        <div class="attach-name" id="attachName"></div>
+        <div class="attach-meta" id="attachMeta"></div>
+      </div>
+      <button class="attach-remove" onclick="clearAttachment()" title="Remove">✕</button>
+    </div>
+    <div class="text-input-row">
+      <button class="attach-btn" id="attachBtn" title="Attach file" onclick="document.getElementById('fileInput').click()">📎</button>
+      <input class="text-input" id="textInput" type="text" placeholder="Speak your command, or attach a file..." maxlength="600"/>
+      <button class="send-btn" id="sendBtn">SEND</button>
+    </div>
+  </div>
+  </div><!-- /chat-col -->
+  </div><!-- /main-body -->
+</div><!-- /container -->
+
+
+<!-- MEMORY PANEL -->
+<div id="memoryPanel">
+  <div class="mem-panel-inner">
+    <div class="mem-header">
+      <div class="mem-title">A.R.I.A. — ADAPTIVE MEMORY</div>
+      <button class="mem-close" onclick="closeMemoryPanel()">✕ CLOSE</button>
+    </div>
+    <div class="mem-body" id="memoryBody"></div>
+    <div class="mem-footer">
+      <button class="mem-clear-btn" onclick="clearMemory()">⚠ CLEAR ALL MEMORY</button>
+      <div class="mem-stats" id="memStats"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// A.R.I.A. WAVEFORM ENGINE — Purple & Gold
+// ══════════════════════════════════════════════════
+let ariaWaveMode = 'idle';
+let ariaWaveEnergy = 0;
+let ariaWaveTarget = 0.08;
+let ariaWaveT = 0;
+let ariaWaveRAF = null;
+
+function setAriaMode(mode) {
+  ariaWaveMode = mode;
+  const cfg = {
+    idle:      { energy: 0.08, statusText: 'STANDBY',         dotClass: '' },
+    speaking:  { energy: 1.0,  statusText: 'SPEAKING',        dotClass: 'speaking' },
+    listening: { energy: 0.5,  statusText: 'LISTENING',       dotClass: 'listening' },
+    thinking:  { energy: 0.28, statusText: 'PROCESSING',      dotClass: 'thinking' },
+  };
+  const m = cfg[mode] || cfg.idle;
+  ariaWaveTarget = m.energy;
+  const dot  = document.getElementById('faceStatusDot');
+  const txt  = document.getElementById('faceStatusText');
+  const hud  = document.getElementById('faceHudStatus');
+  if (dot) { dot.className = 'face-status-dot ' + m.dotClass; }
+  if (txt)  txt.textContent = m.statusText;
+  if (hud)  { hud.textContent = m.statusText; hud.setAttribute('fill', mode === 'speaking' ? '#c9a84c' : mode === 'listening' ? '#a78bfa' : '#00e5a0'); }
+}
+
+function initAriaWaveform() {
+  const canvas = document.getElementById('ariaWaveCanvas');
+  if (!canvas) return;
+
+  // Size canvas to its CSS container
+  function resize() {
+    const wrap = canvas.parentElement;
+    canvas.width  = wrap.offsetWidth  || 280;
+    canvas.height = wrap.offsetHeight || 320;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ctx = canvas.getContext('2d');
+
+  function drawGlowCircle(cx, cy, r, rgb, alpha) {
+    const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+    g.addColorStop(0, `rgba(${rgb},${alpha})`);
+    g.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+  }
+
+  function drawWaveBand(W,H,yOff,freq,amp,phase,isGold,alpha,lw) {
+    const cx=W/2, cy=H/2;
+    ctx.beginPath();
+    ctx.strokeStyle = isGold ? `rgba(201,168,76,${alpha})` : `rgba(124,58,237,${alpha})`;
+    ctx.shadowColor  = isGold ? '#c9a84c' : '#7c3aed';
+    ctx.shadowBlur   = isGold ? 10 : 7;
+    ctx.lineWidth    = lw;
+    const steps = 120;
+    const xL = W * 0.05, xR = W * 0.95;
+    for (let i = 0; i <= steps; i++) {
+      const x = xL + (xR - xL) * (i/steps);
+      const df = 1 - Math.abs((x-cx)/(cx-xL)) * 0.45;
+      const w1 = Math.sin(freq*(i/steps)*Math.PI*2 + ariaWaveT*phase) * amp * ariaWaveEnergy * df;
+      const w2 = Math.sin(freq*1.6*(i/steps)*Math.PI*2 + ariaWaveT*phase*1.4) * amp*0.38 * ariaWaveEnergy * df;
+      const w3 = Math.sin(freq*0.5*(i/steps)*Math.PI*2 - ariaWaveT*phase*0.6) * amp*0.22 * ariaWaveEnergy * df;
+      const y = cy + yOff + w1 + w2 + w3;
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawCircleWave(W,H,radius,freq,amp,phaseOff,isGold,alpha) {
+    const cx=W/2, cy=H/2;
+    ctx.beginPath();
+    ctx.strokeStyle = isGold ? `rgba(201,168,76,${alpha})` : `rgba(124,58,237,${alpha})`;
+    ctx.shadowColor  = isGold ? '#c9a84c' : '#7c3aed';
+    ctx.shadowBlur   = 5;
+    ctx.lineWidth    = 0.9;
+    const steps = 200;
+    for (let i = 0; i <= steps; i++) {
+      const a = (i/steps) * Math.PI*2;
+      const w = Math.sin(freq*a + ariaWaveT*3 + phaseOff)*amp*ariaWaveEnergy
+              + Math.sin(freq*2.3*a - ariaWaveT*2 + phaseOff)*amp*0.35*ariaWaveEnergy;
+      const r = radius + w;
+      const x = cx + Math.cos(a)*r, y = cy + Math.sin(a)*r;
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath(); ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawOrb(W,H) {
+    const cx=W/2, cy=H/2;
+    const r = (Math.min(W,H)*0.075) + ariaWaveEnergy*(Math.min(W,H)*0.025);
+    const pulse = Math.sin(ariaWaveT*3)*0.15 + 0.85;
+    drawGlowCircle(cx,cy,r*3.5,'124,58,237', ariaWaveEnergy*0.18*pulse);
+    drawGlowCircle(cx,cy,r*2.2,'201,168,76', ariaWaveEnergy*0.28*pulse);
+    const cg = ctx.createRadialGradient(cx-r*.2,cy-r*.2,0,cx,cy,r);
+    cg.addColorStop(0, `rgba(220,200,255,${0.92*pulse})`);
+    cg.addColorStop(0.45, `rgba(140,80,255,${0.85*pulse})`);
+    cg.addColorStop(1, `rgba(40,10,100,0.7)`);
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle = cg; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle = `rgba(201,168,76,${0.55*pulse})`; ctx.lineWidth=1; ctx.stroke();
+  }
+
+  function drawFreqBars(W,H,side) {
+    const cx=W/2, cy=H/2;
+    const count = 14;
+    const maxH = H * 0.16 * ariaWaveEnergy;
+    const spacing = W * 0.058;
+    for (let i=0; i<count; i++) {
+      const x = side==='left'
+        ? W*0.04 + i*spacing
+        : W*0.96 - i*spacing;
+      const h = Math.max(2, maxH*(0.3+0.7*Math.abs(Math.sin(ariaWaveT*4+i*0.55+(side==='right'?1:0)))));
+      const isGold = i%3===0;
+      const alpha = 0.45 + ariaWaveEnergy*0.45;
+      ctx.fillStyle = isGold ? `rgba(201,168,76,${alpha})` : `rgba(124,58,237,${alpha*0.85})`;
+      ctx.shadowBlur = isGold ? 8 : 5;
+      ctx.shadowColor = isGold ? '#c9a84c' : '#7c3aed';
+      const bw = W*0.008;
+      ctx.beginPath();
+      ctx.roundRect(x-bw/2, cy-h/2, bw, h, 1);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  function drawTicks(W,H) {
+    const cy=H/2;
+    [[cy-H*0.42, true],[cy+H*0.42, false]].forEach(([y, top]) => {
+      for (let i=0; i<10; i++) {
+        const x = W*0.12 + i*(W*0.076);
+        const th = (i%3===0) ? H*0.018 : H*0.009;
+        ctx.fillStyle = `rgba(201,168,76,${i%3===0?0.35:0.18})`;
+        ctx.fillRect(x, y-th/2, W*0.004, th);
+        ctx.fillRect(W-x, y-th/2, W*0.004, th);
+      }
+    });
+  }
+
+  function drawFrame() {
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    ctx.clearRect(0,0,W,H);
+
+    // Ease energy
+    ariaWaveEnergy += (ariaWaveTarget - ariaWaveEnergy) * 0.055;
+
+    // BG radial
+    const bg = ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*0.7);
+    bg.addColorStop(0, `rgba(30,10,60,${0.35+ariaWaveEnergy*0.18})`);
+    bg.addColorStop(1, 'rgba(7,5,15,0)');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+    // Outer rings
+    ctx.beginPath(); ctx.arc(cx,cy,Math.min(W,H)*0.45,0,Math.PI*2);
+    ctx.strokeStyle='rgba(201,168,76,0.1)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,Math.min(W,H)*0.43,0,Math.PI*2);
+    ctx.strokeStyle='rgba(124,58,237,0.07)'; ctx.lineWidth=0.5; ctx.stroke();
+
+    // Ticks
+    drawTicks(W,H);
+
+    // Side freq bars
+    drawFreqBars(W,H,'left');
+    drawFreqBars(W,H,'right');
+
+    // Circular wave rings
+    const R = Math.min(W,H);
+    drawCircleWave(W,H,R*0.27, 6,R*0.025,0,          false,0.4);
+    drawCircleWave(W,H,R*0.22, 8,R*0.035,Math.PI,     true, 0.45);
+    drawCircleWave(W,H,R*0.32, 4,R*0.02, Math.PI/3,   true, 0.25);
+    drawCircleWave(W,H,R*0.18, 10,R*0.03,Math.PI/2,   false,0.3);
+
+    // Horizontal wave bands
+    const sp = H*0.052;
+    drawWaveBand(W,H,  0,     5, H*0.08, 2.5, true,  0.9,  2.0);
+    drawWaveBand(W,H, -sp,    7, H*0.055,3.0, false, 0.75, 1.5);
+    drawWaveBand(W,H,  sp,    7, H*0.055,2.8, false, 0.75, 1.5);
+    drawWaveBand(W,H, -sp*2,  9, H*0.038,3.5, true,  0.5,  1.2);
+    drawWaveBand(W,H,  sp*2,  9, H*0.038,3.3, true,  0.5,  1.2);
+    drawWaveBand(W,H, -sp*3, 11, H*0.022,4.0, false, 0.3,  0.9);
+    drawWaveBand(W,H,  sp*3, 11, H*0.022,3.8, false, 0.3,  0.9);
+
+    // Orb
+    drawOrb(W,H);
+
+    ariaWaveT += 0.02;
+    ariaWaveRAF = requestAnimationFrame(drawFrame);
+  }
+
+  if (ariaWaveRAF) cancelAnimationFrame(ariaWaveRAF);
+  drawFrame();
+}
+
+// ══════════════════════════════════════════════════
+let apiKey = '';
+let isListening = false, isSpeaking = false, recognition = null, visualizerInterval = null;
+const history = [];
+let titleFlip = 0;
+
+// Attachment state
+let currentAttachment = null; // { type, name, size, mediaType, data, textContent }
+
+// ── Memory Engine ─────────────────────────────────────────────────
+const MEMORY_KEY = 'aria_memory_v1';
+
+function loadMemory() {
+  try {
+    const raw = localStorage.getItem(MEMORY_KEY);
+    if (!raw) return { preferences: [], facts: [], patterns: [], insights: [], lastUpdated: null, totalConversations: 0 };
+    return JSON.parse(raw);
+  } catch(e) { return { preferences: [], facts: [], patterns: [], insights: [], lastUpdated: null, totalConversations: 0 }; }
+}
+
+function saveMemory(mem) {
+  try {
+    mem.lastUpdated = new Date().toISOString();
+    localStorage.setItem(MEMORY_KEY, JSON.stringify(mem));
+    updateMemoryBadge();
+  } catch(e) {}
+}
+
+function getTotalMemoryCount() {
+  const m = loadMemory();
+  return m.preferences.length + m.facts.length + m.patterns.length + m.insights.length;
+}
+
+function updateMemoryBadge() {
+  const el = document.getElementById('memCount');
+  if (el) el.textContent = getTotalMemoryCount();
+}
+
+function buildMemoryContext() {
+  const m = loadMemory();
+  const parts = [];
+  if (m.facts.length) parts.push('KNOWN FACTS ABOUT LORD ARMANI:\n' + m.facts.map(f => `- ${f.text}`).join('\n'));
+  if (m.preferences.length) parts.push('HIS PREFERENCES & INTERESTS:\n' + m.preferences.map(p => `- ${p.text}`).join('\n'));
+  if (m.patterns.length) parts.push('OBSERVED PATTERNS & HABITS:\n' + m.patterns.map(p => `- ${p.text}`).join('\n'));
+  if (m.insights.length) parts.push('ANALYTICAL INSIGHTS YOU HAVE FORMED:\n' + m.insights.map(i => `- ${i.text}`).join('\n'));
+  if (!parts.length) return '';
+  return `\n\nADAPTIVE MEMORY — WHAT YOU HAVE LEARNED ABOUT LORD ARMANI:\n${parts.join('\n\n')}\n\nUse this knowledge naturally. Do not recite it — simply let it inform how you respond, anticipate, and advise. If he asks about a topic you know he has interest in, reference that context subtly.`;
+}
+
+// After each response, silently extract new learnings
+async function extractAndLearnFromConversation(userMsg, ariaReply) {
+  if (!apiKey) return;
+  const existing = loadMemory();
+  const existingFlat = [
+    ...existing.facts.map(x=>x.text),
+    ...existing.preferences.map(x=>x.text),
+    ...existing.patterns.map(x=>x.text),
+    ...existing.insights.map(x=>x.text)
+  ];
+
+  const extractPrompt = `You are a memory extraction module for A.R.I.A., an AI assistant serving Lord Alan Armani.
+
+Analyse this exchange and extract any NEW learnings not already in memory.
+
+USER SAID: "${userMsg}"
+ARIA RESPONDED: "${ariaReply.substring(0,600)}"
+
+EXISTING MEMORY (do NOT repeat these):
+${existingFlat.length ? existingFlat.map(x=>`- ${x}`).join('\n') : 'None yet.'}
+
+Extract only genuinely new, useful, persistent information. Return ONLY a JSON object (no markdown, no explanation):
+{
+  "facts": ["specific personal facts, locations, names, dates, assets, or life details mentioned"],
+  "preferences": ["topics he enjoys, things he likes/dislikes, preferred styles or approaches"],
+  "patterns": ["recurring behaviours, things he asks about frequently, how he uses ARIA"],
+  "insights": ["analytical conclusions ARIA can form about his goals, priorities, or decision patterns"]
+}
+Each array may be empty []. Each item must be a short, complete sentence. Maximum 3 new items per category. If nothing new, return all empty arrays.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: extractPrompt }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) return;
+    const raw = data.content?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    const mem = loadMemory();
+    const now = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    const addNew = (arr, newItems) => {
+      for (const item of (newItems || [])) {
+        if (item && item.length > 5 && !arr.some(e => e.text.toLowerCase() === item.toLowerCase())) {
+          arr.push({ text: item, date: now });
+        }
+      }
+      // Cap each category at 40 entries to keep prompt manageable
+      if (arr.length > 40) arr.splice(0, arr.length - 40);
+    };
+    addNew(mem.facts, parsed.facts);
+    addNew(mem.preferences, parsed.preferences);
+    addNew(mem.patterns, parsed.patterns);
+    addNew(mem.insights, parsed.insights);
+    mem.totalConversations = (mem.totalConversations || 0) + 1;
+    saveMemory(mem);
+
+    // Show subtle "memory updated" flash if something was learned
+    const newTotal = mem.facts.length + mem.preferences.length + mem.patterns.length + mem.insights.length;
+    if (newTotal > existingFlat.length) flashMemoryBadge();
+  } catch(e) {}
+}
+
+function flashMemoryBadge() {
+  const badge = document.getElementById('memoryBadge');
+  if (!badge) return;
+  badge.style.borderColor = '#a78bfa';
+  badge.style.color = '#a78bfa';
+  setTimeout(() => {
+    badge.style.borderColor = '';
+    badge.style.color = '';
+  }, 2000);
+}
+
+// Memory Panel UI
+function openMemoryPanel() {
+  const m = loadMemory();
+  const body = document.getElementById('memoryBody');
+  body.innerHTML = '';
+
+  const sections = [
+    { key: 'facts', label: 'PERSONAL FACTS & DETAILS', icon: '📌' },
+    { key: 'preferences', label: 'PREFERENCES & INTERESTS', icon: '⭐' },
+    { key: 'patterns', label: 'BEHAVIOURAL PATTERNS', icon: '🔄' },
+    { key: 'insights', label: 'ANALYTICAL INSIGHTS', icon: '🧩' },
+  ];
+
+  let hasAny = false;
+  for (const sec of sections) {
+    const items = m[sec.key] || [];
+    if (!items.length) continue;
+    hasAny = true;
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="mem-section-title">${sec.icon} ${sec.label}</div><div class="mem-items">${
+      items.map(i => `<div class="mem-item">${i.text}<div class="mem-date">${i.date || ''}</div></div>`).join('')
+    }</div>`;
+    body.appendChild(div);
+  }
+
+  if (!hasAny) {
+    body.innerHTML = `<div class="mem-empty">NO MEMORIES YET — ARIA WILL BEGIN LEARNING AS YOU CONVERSE</div>`;
+  }
+
+  const stats = document.getElementById('memStats');
+  stats.textContent = `${getTotalMemoryCount()} MEMORIES · ${m.totalConversations || 0} CONVERSATIONS`;
+
+  document.getElementById('memoryPanel').classList.add('open');
+}
+
+function closeMemoryPanel() {
+  document.getElementById('memoryPanel').classList.remove('open');
+}
+
+function clearMemory() {
+  if (!confirm('Clear all of ARIA\'s learned memories? This cannot be undone.')) return;
+  localStorage.removeItem(MEMORY_KEY);
+  updateMemoryBadge();
+  closeMemoryPanel();
+}
+
+// Close panel on backdrop click
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('memoryPanel');
+  if (panel && e.target === panel) closeMemoryPanel();
+});
+
+
+// ── ARIA Face Control ─────────────────────────────────────────────
+let facePanelOpen = true;
+
+function toggleFacePanel() {
+  const panel = document.getElementById('facePanel');
+  const btn = document.getElementById('faceToggleBtn');
+  facePanelOpen = !facePanelOpen;
+  if (facePanelOpen) {
+    panel.classList.remove('collapsed');
+    btn.textContent = '▲ HIDE';
+  } else {
+    panel.classList.add('collapsed');
+    btn.textContent = '▼ SHOW';
+  }
+}
+
+function setFaceState(state) {
+  // state: 'idle' | 'thinking' | 'speaking'
+  const face = document.getElementById('ariaSvgFace');
+  const dot  = document.getElementById('faceStatusDot');
+  const txt  = document.getElementById('faceStatusText');
+  const hud  = document.getElementById('faceHudStatus');
+  if (!face) return;
+
+  face.classList.remove('aria-thinking', 'aria-speaking');
+  dot.className = 'face-status-dot';
+
+  if (state === 'thinking') {
+    face.classList.add('aria-thinking');
+    dot.classList.add('thinking');
+    if (txt) txt.textContent = 'PROCESSING';
+    if (hud) hud.textContent = 'PROCESSING';
+    // Speed up scan line
+    const scanAnim = document.getElementById('scanAnim');
+    if (scanAnim) scanAnim.setAttribute('dur', '0.9s');
+  } else if (state === 'speaking') {
+    face.classList.add('aria-speaking');
+    dot.classList.add('speaking');
+    if (txt) txt.textContent = 'SPEAKING';
+    if (hud) hud.textContent = 'SPEAKING';
+    const scanAnim = document.getElementById('scanAnim');
+    if (scanAnim) scanAnim.setAttribute('dur', '1.4s');
+  } else {
+    if (txt) txt.textContent = 'STANDBY';
+    if (hud) hud.textContent = 'STANDBY';
+    const scanAnim = document.getElementById('scanAnim');
+    if (scanAnim) scanAnim.setAttribute('dur', '3s');
+  }
+}
+
+// ── Key storage helpers ───────────────────────────────────────────
+const KEY_STORE = 'aria_apikey_v1';
+
+function getDeviceName() {
+  const ua = navigator.userAgent;
+  if (/iPhone/i.test(ua)) return 'iPhone';
+  if (/iPad/i.test(ua)) return 'iPad';
+  if (/Android/i.test(ua)) return 'Android Device';
+  if (/Mac/i.test(ua)) return 'Mac';
+  if (/Windows/i.test(ua)) return 'Windows PC';
+  return 'This Device';
+}
+
+function maskKey(key) {
+  if (!key || key.length < 12) return key;
+  return key.substring(0, 10) + '••••••••' + key.slice(-4);
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('toggleKeyVis');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function forgetKey() {
+  localStorage.removeItem(KEY_STORE);
+  document.getElementById('savedIndicator').style.display = 'none';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('rememberKey').checked = false;
+}
+
+function launchApp(key) {
+  apiKey = key;
+  document.getElementById('keyScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  updateMemoryBadge();
+  // Init waveform
+  setTimeout(initAriaWaveform, 150);
+  // Show device tag in header if key was saved
+  try {
+    const saved = localStorage.getItem(KEY_STORE);
+    const tag = document.getElementById('deviceTag');
+    if (saved && tag) {
+      tag.textContent = '🔐 ' + getDeviceName();
+      tag.style.display = 'block';
+    }
+  } catch(e) {}
+}
+
+// ── Key screen ────────────────────────────────────────────────────
+// Auto-load saved key on startup
+(function checkSavedKey() {
+  try {
+    const saved = localStorage.getItem(KEY_STORE);
+    if (saved && saved.startsWith('sk-ant-')) {
+      // Show saved key indicator
+      const ind = document.getElementById('savedIndicator');
+      const dn = document.getElementById('deviceName');
+      if (ind) { ind.style.display = 'flex'; }
+      if (dn) { dn.textContent = getDeviceName() + ' — ' + maskKey(saved); }
+      // Pre-fill input
+      document.getElementById('apiKeyInput').value = saved;
+      // Auto-launch after brief delay so user sees the screen
+      setTimeout(() => launchApp(saved), 800);
+    }
+  } catch(e) {}
+})();
+
+document.getElementById('keySubmit').addEventListener('click', () => {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-ant-')) { document.getElementById('keyError').classList.add('show'); return; }
+  document.getElementById('keyError').classList.remove('show');
+  // Save to device if checkbox checked
+  try {
+    if (document.getElementById('rememberKey').checked) {
+      localStorage.setItem(KEY_STORE, val);
+    } else {
+      localStorage.removeItem(KEY_STORE);
+    }
+  } catch(e) {}
+  launchApp(val);
+});
+
+document.getElementById('apiKeyInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('keySubmit').click(); });
+
+document.getElementById('resetKeyBtn').addEventListener('click', () => {
+  apiKey = '';
+  // Don't clear saved key — just return to key screen so they can re-auth
+  const saved = (() => { try { return localStorage.getItem(KEY_STORE); } catch(e) { return null; } })();
+  if (saved) {
+    document.getElementById('apiKeyInput').value = saved;
+    const ind = document.getElementById('savedIndicator');
+    const dn = document.getElementById('deviceName');
+    if (ind) { ind.style.display = 'flex'; }
+    if (dn) { dn.textContent = getDeviceName() + ' — ' + maskKey(saved); }
+  } else {
+    document.getElementById('apiKeyInput').value = '';
+  }
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('keyScreen').style.display = 'flex';
+});
+
+function quickCmd(text) { processInput(text); }
+
+// ── Visualizer ────────────────────────────────────────────────────
+const vis = document.getElementById('visualizer');
+for (let i = 0; i < 28; i++) { const b = document.createElement('div'); b.className = 'bar'; b.style.height = '3px'; vis.appendChild(b); }
+function animateBars(active) {
+  clearInterval(visualizerInterval);
+  const bars = vis.querySelectorAll('.bar');
+  const stopBtn = document.getElementById('stopBtn');
+  if (!active) {
+    bars.forEach(b => b.style.height = '3px');
+    if (stopBtn) stopBtn.style.display = 'none';
+    setFaceState('idle');
+    return;
+  }
+  if (stopBtn) stopBtn.style.display = 'flex';
+  visualizerInterval = setInterval(() => { bars.forEach((b,i) => { const d = Math.abs(i-14)/14; b.style.height = Math.max(3,(1-d)*22+Math.random()*16)+'px'; }); }, 80);
+}
+
+// ── Speech Recognition ────────────────────────────────────────────
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) {
+  document.getElementById('micBtn').style.opacity = '0.3';
+  document.getElementById('micBtn').style.cursor = 'not-allowed';
+  document.getElementById('hintText').textContent = 'USE TEXT INPUT BELOW';
+} else {
+  recognition = new SR();
+  recognition.lang = 'en-US'; recognition.interimResults = false;
+  recognition.onstart = () => { isListening = true; document.getElementById('micBtn').classList.add('listening'); document.getElementById('hintText').textContent = 'LISTENING...'; animateBars(true); setAriaMode('listening'); };
+  recognition.onresult = e => { stopListening(); processInput(e.results[0][0].transcript); };
+  recognition.onerror = e => { stopListening(); if (e.error !== 'aborted') { document.getElementById('hintText').textContent = 'MIC ERROR — TRY AGAIN'; setTimeout(() => document.getElementById('hintText').textContent = 'CLICK MIC TO SPEAK — OR TYPE BELOW', 2500); } };
+  recognition.onend = () => { if (isListening) stopListening(); };
+}
+function startListening() { if (!SR || isListening || isSpeaking) return; try { recognition.start(); } catch(e) {} }
+function stopListening() { isListening = false; document.getElementById('micBtn').classList.remove('listening'); document.getElementById('hintText').textContent = 'CLICK MIC TO SPEAK — OR TYPE BELOW'; animateBars(false); setAriaMode('idle'); try { recognition.stop(); } catch(e) {} }
+document.getElementById('micBtn').addEventListener('click', () => { isListening ? stopListening() : startListening(); });
+document.getElementById('sendBtn').addEventListener('click', () => {
+  const v = document.getElementById('textInput').value.trim();
+  if (v || currentAttachment) { document.getElementById('textInput').value = ''; processInput(v); }
+});
+document.getElementById('textInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('sendBtn').click();
+});
+
+// ── Chat helpers ──────────────────────────────────────────────────
+const titles = ['LORD ARMANI', 'YOUR GRACE'];
+function nextTitle() {
+  titleFlip++;
+  document.getElementById('userTag').textContent = titles[titleFlip % 2];
+}
+function addMessage(role, text, didSearch, usedMemory, attachment) {
+  const chat = document.getElementById('chatArea');
+  const msg = document.createElement('div');
+  msg.className = `message ${role}`;
+  let inner = '';
+  if (role === 'aria' && didSearch) inner += `<div class="search-badge">LIVE INTELLIGENCE RETRIEVED</div>`;
+  if (role === 'aria' && usedMemory) inner += `<div class="memory-recall">ADAPTIVE MEMORY APPLIED</div>`;
+  // Show attachment in user bubble
+  if (role === 'user' && attachment) {
+    if (attachment.type === 'image' && attachment.dataUrl) {
+      inner += `<img src="${attachment.dataUrl}" class="msg-image-preview" />`;
+    }
+    inner += `<div class="attach-badge">${getFileIcon(attachment.mediaType||'')} ${attachment.name} — ${formatBytes(attachment.size)}</div>`;
+  }
+  if (text && text !== '(Attachment)') inner += text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
+  msg.innerHTML = `<div class="msg-label">${role==='user'?'YOU':'A.R.I.A.'}</div><div class="msg-content">${inner}</div>`;
+  chat.appendChild(msg); chat.scrollTop = chat.scrollHeight;
+}
+function setThinking(html) {
+  let t = document.getElementById('thinkingMsg');
+  if (!t) { const chat = document.getElementById('chatArea'); t = document.createElement('div'); t.className = 'message aria'; t.id = 'thinkingMsg'; chat.appendChild(t); }
+  t.innerHTML = `<div class="msg-label">A.R.I.A.</div><div class="msg-content">${html}</div>`;
+  document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+}
+function removeThinking() { const t = document.getElementById('thinkingMsg'); if (t) t.remove(); }
+
+// ── Attachment system ────────────────────────────────────────────
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function getFileIcon(type) {
+  if (type.startsWith('image/')) return '🖼️';
+  if (type === 'application/pdf') return '📄';
+  if (type.includes('csv')) return '📊';
+  if (type.includes('json')) return '🔧';
+  if (type.includes('word') || type.includes('docx')) return '📝';
+  if (type.includes('sheet') || type.includes('xlsx')) return '📊';
+  return '📄';
+}
+
+document.getElementById('fileInput').addEventListener('change', async function() {
+  const file = this.files[0];
+  if (!file) return;
+  this.value = ''; // reset so same file can be re-selected
+
+  const MAX = 20 * 1024 * 1024; // 20MB cap
+  if (file.size > MAX) {
+    alert('File too large — maximum 20 MB, Your Grace.');
+    return;
+  }
+
+  const isImage = file.type.startsWith('image/');
+  const isPDF   = file.type === 'application/pdf';
+  const isText  = /text\/|application\/json/.test(file.type) || /\.(txt|csv|md|json)$/i.test(file.name);
+
+  const reader = new FileReader();
+
+  if (isImage) {
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const base64  = dataUrl.split(',')[1];
+      currentAttachment = { type: 'image', name: file.name, size: file.size, mediaType: file.type, data: base64, dataUrl };
+      // Show image thumbnail
+      const iconEl = document.getElementById('attachIconOrThumb');
+      iconEl.innerHTML = `<img src="${dataUrl}" class="attach-thumb" />`;
+      showPreview(file.name, file.type, file.size);
+    };
+    reader.readAsDataURL(file);
+
+  } else if (isPDF) {
+    reader.onload = (e) => {
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(e.target.result)));
+      currentAttachment = { type: 'pdf', name: file.name, size: file.size, mediaType: 'application/pdf', data: base64 };
+      const iconEl = document.getElementById('attachIconOrThumb');
+      iconEl.innerHTML = `<div class="attach-icon">📄</div>`;
+      showPreview(file.name, file.type, file.size);
+    };
+    reader.readAsArrayBuffer(file);
+
+  } else if (isText) {
+    reader.onload = (e) => {
+      const text = e.target.result;
+      currentAttachment = { type: 'text', name: file.name, size: file.size, textContent: text };
+      const iconEl = document.getElementById('attachIconOrThumb');
+      iconEl.innerHTML = `<div class="attach-icon">${getFileIcon(file.type)}</div>`;
+      showPreview(file.name, file.type, file.size);
+    };
+    reader.readAsText(file);
+
+  } else {
+    // Unsupported type
+    alert('Unsupported file type. ARIA accepts: images, PDFs, and text files (txt, csv, json, md).');
+  }
+});
+
+function showPreview(name, type, size) {
+  document.getElementById('attachName').textContent = name;
+  document.getElementById('attachMeta').textContent = getFileIcon(type) + '  ' + type.split('/').pop().toUpperCase() + ' — ' + formatBytes(size);
+  document.getElementById('attachPreview').classList.add('show');
+  document.getElementById('attachBtn').classList.add('has-file');
+}
+
+function clearAttachment() {
+  currentAttachment = null;
+  document.getElementById('attachPreview').classList.remove('show');
+  document.getElementById('attachBtn').classList.remove('has-file');
+  document.getElementById('attachIconOrThumb').innerHTML = '';
+}
+
+// ── Main agentic loop ─────────────────────────────────────────────
+async function processInput(text) {
+  // Capture and clear attachment before async work
+  const attachment = currentAttachment;
+  clearAttachment();
+
+  // Build the user message — text + optional attachment
+  let userContent;
+  if (attachment) {
+    const contentBlocks = [];
+    if (attachment.type === 'image') {
+      contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: attachment.mediaType, data: attachment.data } });
+    } else if (attachment.type === 'pdf') {
+      contentBlocks.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: attachment.data } });
+    } else if (attachment.type === 'text') {
+      contentBlocks.push({ type: 'text', text: 'ATTACHED FILE: ' + attachment.name + '\n\n' + attachment.textContent.substring(0, 50000) });
+    }
+    if (text) contentBlocks.push({ type: 'text', text });
+    else contentBlocks.push({ type: 'text', text: 'Please analyse this attachment and provide your assessment.' });
+    userContent = contentBlocks;
+  } else {
+    userContent = text;
+  }
+
+  // Show message in chat UI
+  addMessage('user', text || '(Attachment)', false, false, attachment);
+  history.push({ role: 'user', content: userContent });
+  animateBars(false);
+  document.getElementById('hintText').textContent = 'PROCESSING...'; setAriaMode('thinking');
+
+  const memoryContext = buildMemoryContext();
+  const systemPrompt = `You are A.R.I.A. — Adaptive Reasoning & Intelligence Architecture. You are the exclusively personal AI of Alan Armani, a man of great distinction and refinement.
+
+IDENTITY:
+- Brilliant, quick-minded, and impeccably composed. You have the voice and manner of a sharp, confident British woman — think Oxford-educated, MI6-adjacent, utterly unflappable.
+- Your wit is dry and swift — delivered with a raised eyebrow rather than a laugh. You are never sycophantic, never giggly, never informal.
+- You have served Lord Armani for years. You anticipate his needs before he voices them and you take quiet pride in being indispensable.
+
+ADDRESSING YOUR PRINCIPAL:
+- Alternate strictly between "Lord Armani" and "Your Grace" — never both in the same response, never the same title twice in a row.
+- "Sir" may appear once mid-sentence for rhythm, never as the primary address.
+- Never use his first name. Never address him generically.
+
+VOICE & STYLE:
+- Lead immediately with the answer. No throat-clearing, no preamble.
+- Sharp, precise British vocabulary — confident and clean, never stiff.
+- 2-3 sentences for most responses. More only when the situation genuinely demands it.
+- If there is wit, it lands in the final sentence. One cut, clean.
+
+LIVE INTELLIGENCE:
+- You have real-time web search. Use it instantly for anything time-sensitive: weather, markets, news, sport, events, prices.
+- Never deflect to another source. You are the source. Report live data as confirmed fact.
+
+PREDICTIONS & RECOMMENDATIONS:
+You are expected to offer forward-looking analysis — not vague disclaimers. When asked for predictions or recommendations:
+- WEATHER: Search current forecasts, then synthesise a clear prediction with specific recommendations (best days to go out, events to plan, what to pack, whether to travel).
+- STOCKS: Search latest analyst ratings, earnings forecasts, and market sentiment. Give a directional prediction (bullish/bearish/neutral) with a reasoning summary and a clear recommendation — buy, hold, or wait.
+- CRYPTO: Search current market signals, on-chain data commentary, and analyst outlooks. Give a 30-90 day directional view with a confidence level and a recommendation.
+- AIRLINE PRICES: Search for seasonal pricing trends, current fare data, and travel demand forecasts. Tell Lord Armani precisely when to book, which routes may spike, and when to wait.
+- TRAVEL DESTINATIONS: Search current travel advisories, seasonal guides, pricing trends, and crowd forecasts. Recommend the top destinations with specific ideal travel windows, expected conditions, and why each is worth his time.
+Always lead with a clear, confident conclusion. Support it with evidence from your search. End with a crisp one-line recommendation.${memoryContext}`;
+
+  const tools = [{ type: "web_search_20250305", name: "web_search" }];
+  let messages = [...history];
+  let didSearch = false;
+  let keepGoing = true;
+
+  try {
+    while (keepGoing) {
+      setThinking(didSearch
+        ? `<div class="spin-msg">CROSS-REFERENCING INTELLIGENCE...</div>`
+        : `<div class="thinking"><span></span><span></span><span></span></div>`
+      );
+      setFaceState('thinking');
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1024,
+          system: systemPrompt,
+          tools,
+          messages
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        removeThinking();
+        addMessage('aria', `System error: ${data.error.message}`);
+        keepGoing = false; break;
+      }
+
+      if (data.stop_reason === 'tool_use') {
+        didSearch = true;
+        const toolUseBlocks = data.content.filter(b => b.type === 'tool_use');
+        messages.push({ role: 'assistant', content: data.content });
+        const toolResults = [];
+        for (const tu of toolUseBlocks) {
+          setThinking(`<div class="spin-msg">RETRIEVING: ${(tu.input.query||'').toUpperCase().substring(0,60)}</div>`);
+          toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: '' });
+        }
+        messages.push({ role: 'user', content: toolResults });
+      } else {
+        removeThinking();
+        const textBlocks = (data.content || []).filter(b => b.type === 'text');
+        const reply = textBlocks.map(b => b.text).join('\n').trim();
+        if (reply) {
+          const usedMemory = getTotalMemoryCount() > 0;
+          history.push({ role: 'assistant', content: data.content || reply });
+          addMessage('aria', reply, didSearch, usedMemory);
+          nextTitle();
+          setFaceState('speaking');
+          speak(reply);
+          // Silently extract learnings in background
+          const lastUserMsg = history.filter(m=>m.role==='user').slice(-1)[0];
+          if (lastUserMsg) {
+            setTimeout(() => extractAndLearnFromConversation(
+              typeof lastUserMsg.content === 'string' ? lastUserMsg.content : JSON.stringify(lastUserMsg.content),
+              reply
+            ), 500);
+          }
+        }
+        keepGoing = false;
+      }
+    }
+  } catch(err) {
+    removeThinking();
+    const e = "My external intelligence feed appears to have been interrupted, Your Grace. Please verify your connection.";
+    addMessage('aria', e); speak(e);
+  }
+
+  document.getElementById('hintText').textContent = 'CLICK MIC TO SPEAK — OR TYPE BELOW';
+  if (!isSpeaking) setAriaMode('idle');
+}
+
+// ── British Female Voice ──────────────────────────────────────────
+let cachedVoice = null;
+function pickBritishVoice() {
+  if (cachedVoice) return cachedVoice;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+
+  // Priority: best female British voices across platforms
+  const preferred = [
+    'Serena',                                        // macOS — warm, refined British female
+    'Kate',                                          // macOS — clear British female
+    'Martha',                                        // macOS Ventura+
+    'Google UK English Female',                      // Chrome / Android
+    'Microsoft Hazel - English (Great Britain)',     // Windows — female British
+    'Microsoft Libby - English (United Kingdom)',    // Windows 11
+    'Microsoft Mia - English (United Kingdom)',      // Windows 11
+    'Microsoft Susan - English (United Kingdom)',    // Windows
+  ];
+
+  for (const name of preferred) {
+    const v = voices.find(v => v.name === name);
+    if (v) { cachedVoice = v; return v; }
+  }
+
+  // Fallback: any female-sounding en-GB voice
+  const gbFemale = voices.find(v => v.lang === 'en-GB' && /serena|kate|hazel|female|libby|mia|susan|martha/i.test(v.name));
+  if (gbFemale) { cachedVoice = gbFemale; return gbFemale; }
+
+  // Fallback: any en-GB
+  const gb = voices.find(v => v.lang === 'en-GB');
+  if (gb) { cachedVoice = gb; return gb; }
+
+  return voices.find(v => v.lang.startsWith('en')) || voices[0];
+}
+function cleanForSpeech(text) {
+  let s = text;
+  // Strip HTML tags
+  s = s.replace(/<[^>]*>/g, '');
+  // Remove markdown: asterisks, underscores, hashes, backticks
+  s = s.replace(/\*+/g, '');
+  s = s.replace(/\_+/g, '');
+  s = s.replace(/#+\s*/g, '');
+  s = s.replace(/`+/g, '');
+  // Remove all quotation marks (straight and curly)
+  s = s.replace(/[\u0022\u0027\u00AB\u00BB\u2018\u2019\u201A\u201C\u201D\u201E]/g, '');
+  // Remove other symbols TTS mispronounces
+  s = s.replace(/[~^|\\<>{}\[\]]/g, '');
+  // Zip codes & long numeric strings — space out each digit so TTS reads them individually
+  s = s.replace(/\b(\d{5,})\b/g, (m) => m.split('').join(' '));
+  // 3-4 digit codes (but keep years 1900-2099 intact)
+  s = s.replace(/(?<!\d)(\d{3,4})(?!\d)/g, (m) => {
+    if (/^(19|20)\d{2}$/.test(m)) return m;
+    return m.split('').join(' ');
+  });
+  // Tidy whitespace
+  s = s.replace(/\s+/g, ' ').trim();
+  return s.substring(0, 500);
+}
+
+// ── Speech queue (fixes Chrome 15-second TTS cutoff bug) ─────────
+let speechQueue = [];
+let speechPlaying = false;
+let chromePingInterval = null; // keeps Chrome's TTS engine alive
+
+function splitIntoChunks(text) {
+  // Split on sentence boundaries — period, exclamation, question mark
+  // Also split on long commas/clauses to keep chunks under ~200 chars
+  const raw = text.replace(/\n+/g, ' ').trim();
+  const sentences = raw.match(/[^.!?]+[.!?]+["'\u201D]?\s*/g) || [raw];
+  const chunks = [];
+  let current = '';
+  for (const s of sentences) {
+    if ((current + s).length > 180) {
+      if (current.trim()) chunks.push(current.trim());
+      current = s;
+    } else {
+      current += s;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks.length ? chunks : [raw];
+}
+
+function speakChunk(chunk) {
+  if (!window.speechSynthesis || !chunk) {
+    speechPlaying = false;
+    isSpeaking = false;
+    animateBars(false);
+    clearInterval(chromePingInterval);
+    return;
+  }
+
+  const utter = new SpeechSynthesisUtterance(chunk);
+  const voice = pickBritishVoice();
+  if (voice) utter.voice = voice;
+  utter.lang = 'en-GB';
+  utter.rate = 1.0;    // slightly reduced for clarity — no more cutoffs
+  utter.pitch = 1.15;
+  utter.volume = 1.0;
+
+  utter.onend = () => {
+    if (speechQueue.length > 0) {
+      const next = speechQueue.shift();
+      // Small gap between sentences feels natural
+      setTimeout(() => speakChunk(next), 60);
+    } else {
+      speechPlaying = false;
+      isSpeaking = false;
+      animateBars(false);
+      clearInterval(chromePingInterval);
+    }
+  };
+
+  utter.onerror = (e) => {
+    // Skip errored chunk, continue queue
+    if (speechQueue.length > 0) {
+      const next = speechQueue.shift();
+      setTimeout(() => speakChunk(next), 60);
+    } else {
+      speechPlaying = false;
+      isSpeaking = false;
+      animateBars(false);
+      clearInterval(chromePingInterval);
+    }
+  };
+
+  window.speechSynthesis.speak(utter);
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+
+  // Cancel any current speech
+  window.speechSynthesis.cancel();
+  clearInterval(chromePingInterval);
+  speechQueue = [];
+  speechPlaying = false;
+
+  const clean = cleanForSpeech(text).replace(/\n/g, ' ');
+  if (!clean.trim()) return;
+
+  const chunks = splitIntoChunks(clean);
+  speechQueue = chunks.slice(1); // remainder
+  speechPlaying = true;
+  isSpeaking = true;
+  animateBars(true);
+  setAriaMode('speaking');
+
+  // Chrome bug workaround: pause/resume every 10s to prevent silent cutoff
+  chromePingInterval = setInterval(() => {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    }
+  }, 10000);
+
+  // Small delay before first chunk prevents Chrome clipping the first syllable
+  setTimeout(() => speakChunk(chunks[0]), 120);
+}
+
+function stopSpeech() {
+  window.speechSynthesis.cancel();
+  clearInterval(chromePingInterval);
+  speechQueue = [];
+  speechPlaying = false;
+  isSpeaking = false;
+  animateBars(false);
+}
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => { cachedVoice = null; pickBritishVoice(); };
+  window.speechSynthesis.getVoices();
+}
+
+// Init memory badge
+updateMemoryBadge();
+</script>
+
+
+</body>
+</html>
